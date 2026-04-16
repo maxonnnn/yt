@@ -214,33 +214,38 @@ app.get('/youtube', async (req, res) => {
     const cookiesPath = getYouTubeCookiesPath(); // Use YouTube specific cookies
     
     // yt-dlp command arguments
-    const args = [
-      videoUrl,
-      '--no-playlist',
-      '--no-warnings',
-      '--output', outputTemplate,
-      '--restrict-filenames'
-    ];
+const args = [
+    videoUrl,
+    '--no-playlist',
+    '--no-warnings',
+    '--output', outputTemplate,
+    '--restrict-filenames',
+    '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36 Edg/147.0.0.0'
+];
 
-    // Add cookies if available
-    if (cookiesPath) {
-      args.push('--cookies', cookiesPath);
-      console.log(`🍪 Using YouTube cookies file for enhanced access`);
-    }
+// Add cookies if available
+if (cookiesPath) {
+    args.push('--cookies', cookiesPath);
+    console.log(`🍪 Using YouTube cookies file for enhanced access`);
+}
 
-    if (isAudio) {
-      args.push(
+// Add PO Token provider for YouTube bot detection bypass
+args.push('--extractor-args', 'youtube:pot-provider=http://localhost:4416');
+console.log(`🔑 PO Token provider enabled`);
+
+if (isAudio) {
+    args.push(
         '--extract-audio', 
         '--audio-format', 'mp3', 
         '--audio-quality', '192K',
         '--embed-metadata'
-      );
-    } else {
-      args.push(
+    );
+} else {
+    args.push(
         '--format', 'best[height<=720][ext=mp4]/best[ext=mp4]/best',
         '--merge-output-format', 'mp4'
-      );
-    }
+    );
+}
 
     console.log(`🎬 Starting ${type} download for: ${videoUrl}`);
     console.log(`📍 Using yt-dlp at: ${ytdlpPath}`);
